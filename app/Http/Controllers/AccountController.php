@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\UserStatus;
+use Toastr;
 
 
 class AccountController extends Controller
@@ -31,8 +32,6 @@ class AccountController extends Controller
                 'users_status.name as status'
             )
             ->get();
-
-        // return response()->json($users);
         return view('contents.account', compact('users'), $this->data);
     }
 
@@ -46,10 +45,6 @@ class AccountController extends Controller
         $user_status = DB::table('users_status')->get();
         $departments = DB::table('departments')->get();
 
-        // return response()->json([
-        //     'user_status' => $user_status,
-        //     'departments' => $departments
-        // ]);
         return view('contents.add', compact('departments', 'user_status'));
     }
 
@@ -61,28 +56,55 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            "status_id" => "required",
-            "username" => "required|unique:users,username",
-            "name" => "required|max:255",
-            "email" => "required|email",
-            "department_id" => "required",
-            "password" => "required|confirmed"
+
+        $request->validate([
+            'username' => 'required',
+            'name' => 'required',
+            'email' => 'required',
+            'password' => 'required',
+            're_password' => 'required',
+            'department_id' => 'required',
+            'status_id' => 'required',
         ], [
-            "status_id.required" => "Nhập Tình trạng",
-            "username.required" => "Nhập Tên Tài khoản",
-            "username.unique" => "Tên Tài khoản đã tồn tại",
-
-            "name.required" => "Nhập Họ và Tên",
-            "name.max" => "Ký tự tối đa là 255",
-
-            "email.required" => "Nhập Email",
-            "email.email" => "Email không hợp lệ",
-
-            "department_id.required" => "Nhập Phòng ban",
-            "password.required" => "Nhập Mật khẩu",
-            "password.confirmed" => "Mật khẩu và Xác nhận mật khẩu không khớp"
+            'username.required' => 'Username is required',
+            'name.required' => 'Name is required',
+            'email.required' => 'Email is required',
+            'password.required' => 'Password is required',
+            're_password.required' => 'Re-Password is required',
+            'department_id.required' => 'Department is required',
+            'status_id.required' => 'Status is required',
         ]);
+
+        $account = new User();
+        $account->username = $request->username;
+        $account->name = $request->name;
+        $account->email = $request->email;
+        $account->password = bcrypt($request->password);
+        $account->department_id = $request->department_id;
+        $account->status_id = $request->status_id;
+
+        $userName = User::where('username', $request->username)->first();
+        if ($userName) {
+            return redirect(route('account.add'))
+                ->with('error', 'Username already exists')
+                ->withInput();
+        }
+
+        $emailUser = User::where('username', $request->username)->first();
+        if ($emailUser) {
+            return redirect(route('account.add'))
+                ->with('error', 'Email already exists')
+                ->withInput();
+        }
+
+        if ($request->password !== $request->re_password) {
+            return redirect(route('account.add'))
+                ->with('error', 'Password not match')
+                ->withInput();
+        }
+
+        $account->save();
+        return back()->with('success', 'Account created successfully');
     }
 
     /**
@@ -109,8 +131,6 @@ class AccountController extends Controller
         $department = Department::all();
         $status = UserStatus::all();
         return view('contents.edit', compact('account', 'department', 'status'));
-
-        // return response()->json($account);
     }
 
     /**
@@ -124,7 +144,6 @@ class AccountController extends Controller
     {
 
         $account = User::find($id);
-
 
         if ($request->has('name')) {
             $account->name = $request->input('name');
@@ -154,9 +173,7 @@ class AccountController extends Controller
 
     public function destroy($id)
     {
-
         $account = User::find($id);
-
         $account->delete();
         return redirect(route('account'))->with('success', 'Account deleted successfully');
     }
