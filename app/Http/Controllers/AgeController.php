@@ -21,7 +21,7 @@ class AgeController extends Controller
         $request->session()->put('age', $age);
         $sessionAge = $request->session()->get('age');
         if ($sessionAge === $age) {
-            return redirect(route('account'));
+            return redirect(route('product'));
         }
     }
 }

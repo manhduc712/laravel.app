@@ -16,9 +16,9 @@ use App\Http\Controllers\HomeController;
 
 Route::get('/', 'HomeController@index')->name('home');
 
-Route::get('product', 'ProductController@index')->name('product');
+Route::get('product', 'ProductController@index')->middleware('check.login')->middleware('check.age')->name('product');
 
-Route::prefix('account')->group(function () {
+Route::middleware('check.login')->prefix('account')->middleware('check.admin')->group(function () {
 
     Route::get('/', 'AccountController@index')->name('account');
 
@@ -33,7 +33,7 @@ Route::prefix('account')->group(function () {
     Route::delete('delete/{id}', 'AccountController@destroy')->name('account.delete');
 });
 
-Route::prefix('age')->group(function () {
+Route::prefix('age')->middleware('check.login')->group(function () {
 
     Route::get('/', 'AgeController@index')->name('age');
 
@@ -44,5 +44,7 @@ Route::prefix('login')->group(function () {
 
     Route::get('/', 'AuthController@login')->name('login');
 
-    Route::post('login', 'AuthController@loginUser')->name('login.check');
+    Route::post('userLogin', 'AuthController@loginUser')->name('login.check');
 });
+
+Route::get('logout', 'AuthController@logout')->name('logout');

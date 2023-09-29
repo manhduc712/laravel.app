@@ -11,7 +11,7 @@
 <body>
     <div class="font-Poppins">
         @include('components.header')
-        <main class="ustify-between items-center mx-auto lg:mt-[15vh] p-4">
+        <main class="justify-between items-center mx-auto lg:mt-[15vh] p-4">
             @yield('content')
         </main>
     </div>

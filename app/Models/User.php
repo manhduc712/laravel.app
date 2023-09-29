@@ -41,4 +41,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function departments()
+    {
+        return $this->belongsTo(Department::class, 'department_id','id');
+    }
+
+    public function userStatus()
+    {
+        return $this->belongsTo(UserStatus::class, 'status_id','id');
+    }
 }

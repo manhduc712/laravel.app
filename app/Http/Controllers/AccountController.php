@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\UserStatus;
-use Toastr;
 
 
 class AccountController extends Controller
@@ -18,21 +17,23 @@ class AccountController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public $data = [];
 
     public function index()
     {
-        $this->data['title'] = 'Account';
 
-        $users = User::join('departments', 'users.department_id', '=', 'departments.id')
-            ->join('users_status', 'users.status_id', '=', 'users_status.id')
-            ->select(
-                'users.*',
-                'departments.name as departments',
-                'users_status.name as status'
-            )
-            ->get();
-        return view('contents.account', compact('users'), $this->data);
+        // $users = User::join('departments', 'users.department_id', '=', 'departments.id')
+        //     ->join('users_status', 'users.status_id', '=', 'users_status.id')
+        //     ->select(
+        //         'users.*',
+        //         'departments.name as departments',
+        //         'users_status.name as status'
+        //     )
+        //     ->paginate(5);
+
+        // with,load, withCount, withMax, withMin, withAvg, withSum
+        $users = User::with(['userStatus', 'departments'])->paginate(5);
+
+        return view('contents.account', compact('users'));
     }
 
     /**
@@ -42,8 +43,11 @@ class AccountController extends Controller
      */
     public function create()
     {
-        $user_status = DB::table('users_status')->get();
-        $departments = DB::table('departments')->get();
+        // $user_status = DB::table('users_status')->get();
+        // $departments = DB::table('departments')->get();
+
+        $user_status = UserStatus::all();
+        $departments = Department::all();
 
         return view('contents.add', compact('departments', 'user_status'));
     }
@@ -90,7 +94,7 @@ class AccountController extends Controller
                 ->withInput();
         }
 
-        $emailUser = User::where('username', $request->username)->first();
+        $emailUser = User::where('email', $request->email)->first();
         if ($emailUser) {
             return redirect(route('account.add'))
                 ->with('error', 'Email already exists')
@@ -104,7 +108,7 @@ class AccountController extends Controller
         }
 
         $account->save();
-        return back()->with('success', 'Account created successfully');
+        return redirect(route('account'))->with('success', 'Account created successfully');
     }
 
     /**
@@ -130,6 +134,7 @@ class AccountController extends Controller
         $account = User::find($id);
         $department = Department::all();
         $status = UserStatus::all();
+
         return view('contents.edit', compact('account', 'department', 'status'));
     }
 
@@ -157,6 +162,9 @@ class AccountController extends Controller
         }
 
         if ($request->has('status_id')) {
+            if ($id == 1) {
+                return redirect(route('account'))->with('error', 'Account cannot be updated');
+            }
             $account->status_id = $request->input('status_id');
         }
 
@@ -173,8 +181,15 @@ class AccountController extends Controller
 
     public function destroy($id)
     {
-        $account = User::find($id);
-        $account->delete();
-        return redirect(route('account'))->with('success', 'Account deleted successfully');
+        // $account = User::find($id);
+        // $account->delete();
+        // return redirect(route('account'))->with('success', 'Account deleted successfully');
+
+        if ($id != 1) {
+            User::find($id)->delete();
+            return redirect()->route('account')->with('success', 'Account deleted successfully');
+        } else {
+            return redirect()->route('account')->with('error', 'Account cannot be deleted');
+        }
     }
 }
