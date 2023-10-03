@@ -13,12 +13,26 @@
                             id="name" name="name" value="{{ $account->name }}" />
                     </div>
 
-                    <div class="mt-3">
+                    <div class="mt-3 relative">
                         <label for="" class="block font-semibold">Email</label>
                         <input type="email" placeholder="Tài khoản email ứng viên"
                             class="w-full px-3 py-2 outline-none border rounded-lg" id="email" name="email"
                             value="{{ $account->email }}" />
+
+                        @if ($account->id != 1)
+                            <!-- Chỉ hiển thị khi tài khoản không có ID là 1 -->
+                            @if ($account->email_verified_at)
+                                <i
+                                    class="bi bi-check2-all text-xl text-green-500 absolute top-1/2 transform -translate-y-1/2 right-3 mt-3"></i>
+                            @else
+                                <button type="button"
+                                    class="btn btn-primary absolute top-1/2 transform -translate-y-1/2 right-1 mt-3 rounded-md bg-green-500 hover:bg-green-700 text-white px-5 py-2">Xác
+                                    minh</button>
+                            @endif
+                        @endif
                     </div>
+
+
 
                     <div class="mt-3">
                         <label for="department" class="block font-semibold">Department</label>

@@ -48,3 +48,5 @@ Route::prefix('login')->group(function () {
 });
 
 Route::get('logout', 'AuthController@logout')->name('logout');
+
+Route::get('test-gmail', 'HomeController@testGmail');

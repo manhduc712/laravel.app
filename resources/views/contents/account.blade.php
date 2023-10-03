@@ -4,7 +4,7 @@
     <main class="w-8/12 mx-auto">
         <h1 class="text-center p-2 font-bold text-xl uppercase">Danh Sách account</h1>
         <section class="flex justify-center">
-            <div class="w-full px-4 py-2">
+            <div class="w-full py-2">
                 <button
                     class="border px-4 py-2 rounded-lg text-black font-semibold hover:text-white bg-white hover:bg-[#0091ce]">
                     <a href="{{ route('account.add') }}">Add</a>
@@ -28,8 +28,14 @@
                                 <td class="border border-gray-300 px-4 py-2 font-semibold">{{ $user->id }}</td>
                                 <td class="border border-gray-300 px-4 py-2 font-semibold">{{ $user->username }}</td>
                                 <td class="border border-gray-300 px-4 py-2 font-semibold">{{ $user->name }}</td>
-                                <td class="border border-gray-300 px-4 py-2 font-semibold">{{ $user->email }}</td>
-                                <td class="border border-gray-300 px-4 py-2 font-semibold">{{ $user->departments->name }}</td>
+                                <td class="border border-gray-300 px-4 py-2 font-semibold">
+                                    {{ $user->email }}
+                                    @if ($user->email_verified_at)
+                                        <i class="bi bi-check2-all flex justify-end text-xl text-green-500"></i>
+                                    @endif
+                                </td>
+                                <td class="border border-gray-300 px-4 py-2 font-semibold">{{ $user->departments->name }}
+                                </td>
                                 <td class="border border-gray-300 px-4 py-2">
                                     @if ($user->userStatus->name === 'Active')
                                         <span
@@ -47,14 +53,15 @@
                                     @endif
                                 </td>
 
-                                <td class="border border-gray-300 px-4 py-2 flex justify-center gap-x-3">
+                                <td class="border-b-2 border-gray-300 px-4 py-2 flex justify-center gap-x-3">
 
                                     <button
                                         class="border px-4 py-2 rounded-lg text-black font-semibold hover:text-white bg-white hover:bg-[#0091ce]">
                                         <a href="{{ route('account.edit', ['id' => $user->id]) }}">Edit</a>
                                     </button>
 
-                                    <form action="{{ route('account.delete', ['id' => $user->id]) }}" method="POST">
+                                    <form action="{{ route('account.delete', ['id' => $user->id]) }}" method="POST"
+                                        class="border-b-none">
                                         @method('DELETE')
                                         @csrf
                                         <button

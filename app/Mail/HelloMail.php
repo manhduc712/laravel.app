@@ -11,6 +11,9 @@ class HelloMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+
+
+
     /**
      * Create a new message instance.
      *
@@ -18,7 +21,6 @@ class HelloMail extends Mailable
      */
     public function __construct()
     {
-        //
     }
 
     /**

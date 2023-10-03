@@ -31,7 +31,7 @@ class AccountController extends Controller
         //     ->paginate(5);
 
         // with,load, withCount, withMax, withMin, withAvg, withSum
-        $users = User::with(['userStatus', 'departments'])->paginate(5);
+        $users = User::with(['userStatus', 'departments'])->paginate(4);
 
         return view('contents.account', compact('users'));
     }
